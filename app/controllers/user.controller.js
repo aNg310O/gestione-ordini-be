@@ -10,14 +10,17 @@ const Log = db.logs;
 
 exports.findAllProduct = (req, res) => {
   const desc = req.query.desc;
-  var condition = desc ? { desc: { $regex: new RegExp(desc), $options: "i" } } : {};
-  Prodotti.find(condition).sort({ 'desc': 1 })
-    .then(data => {
+  var condition = desc
+    ? { desc: { $regex: new RegExp(desc), $options: "i" } }
+    : {};
+  Prodotti.find(condition)
+    .sort({ desc: 1 })
+    .then((data) => {
       res.status(200).send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: `${err.message} - Errore nel recupero dei prodotti.`
+        message: `${err.message} - Errore nel recupero dei prodotti.`,
       });
     });
 };
@@ -30,16 +33,16 @@ exports.createProduct = (req, res) => {
   const prodotti = new Prodotti({
     desc: req.body.desc,
     grammatura: req.body.grammatura,
-    pesoTotale: req.body.pesoTotale
+    pesoTotale: req.body.pesoTotale,
   });
   prodotti
     .save(prodotti)
-    .then(data => {
+    .then((data) => {
       res.status(200).send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: `${err.message} - Errore nella creazione del prodotto.`
+        message: `${err.message} - Errore nella creazione del prodotto.`,
       });
     });
 };
@@ -47,20 +50,20 @@ exports.createProduct = (req, res) => {
 exports.deleteProduct = (req, res) => {
   const prodDaCanc = req.params.id;
   Prodotti.findByIdAndDelete(prodDaCanc)
-    .then(data => {
+    .then((data) => {
       if (!data) {
         res.status(404).send({
-          message: `${err.message} - Non posso cancellare il prodotto ${prodDaCanc} con id=${id}`
+          message: `${err.message} - Non posso cancellare il prodotto ${prodDaCanc} con id=${id}`,
         });
       } else {
         res.status(200).send({
-          message: `Prodotto ${prodDaCanc} cancellato!`
+          message: `Prodotto ${prodDaCanc} cancellato!`,
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: `${err.message} - Non posso cancellare il prodotto ${prodDaCanc} con id=${id}`
+        message: `${err.message} - Non posso cancellare il prodotto ${prodDaCanc} con id=${id}`,
       });
     });
 };
@@ -69,102 +72,110 @@ exports.deleteProduct = (req, res) => {
     API GESTIONE PRODOTTI SPLIT
   ###############################*/
 
-  exports.findAllProductsplit = (req, res) => {
-    const prodotto = req.query.prodotto;
-    var condition = prodotto ? { prodotto: { $regex: new RegExp(prodotto), $options: "i" } } : {};
-    Prodottisplit.find(condition).sort({ 'prodotto': 1, 'pesoTotale': 1, 'pezzatura': 1 }).collation({ locale: "en_US", numericOrdering: true })
-      .then(data => {
-        res.status(200).send(data);
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: `${err.message} - Errore nel recupero dei prodotti.`
-        });
+exports.findAllProductsplit = (req, res) => {
+  const prodotto = req.query.prodotto;
+  var condition = prodotto
+    ? { prodotto: { $regex: new RegExp(prodotto), $options: "i" } }
+    : {};
+  Prodottisplit.find(condition)
+    .sort({ prodotto: 1, pesoTotale: 1, pezzatura: 1 })
+    .collation({ locale: "en_US", numericOrdering: true })
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: `${err.message} - Errore nel recupero dei prodotti.`,
       });
-  };
-
-  exports.findProductsplit = (req, res) => {
-    Prodottisplit.find().distinct('prodotto')
-      .then(data => {
-        res.status(200).send(data);
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: `${err.message} - Errore nel recupero dei prodotti.`
-        });
-      });
-  };
-
-  exports.findPesosplit = (req, res) => {
-    const prodotto = req.params.prodotto;
-    var condition = { prodotto: { $regex: new RegExp(prodotto), $options: "i" } };
-    Prodottisplit.find(condition).distinct('pesoTotale')
-      .then(data => {
-        res.status(200).send(data);
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: `${err.message} - Errore nel recupero dei prodotti.`
-        });
-      });
-  };
-  
-  exports.findPezzaturasplit = (req, res) => {
-    const prodotto = req.query.prodotto;
-    const peso = req.query.peso;
-    Prodottisplit.find({ $and: [{ prodotto: prodotto }, { pesoTotale: peso }] }).distinct('pezzatura').collation({ locale: "en_US", numericOrdering: true })
-      .then(data => {
-        res.status(200).send(data);
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: `${err.message} - Errore nel recupero dei prodotti.`
-        });
-      });
-  };
-
-  exports.createProductsplit = (req, res) => {
-    if (!req.body.prodotto) {
-      res.status(400).send({ message: "Il prodotto non può essere vuoto!" });
-      return;
-    }
-    const prodotti = new Prodottisplit({
-      prodotto: req.body.prodotto,
-      pesoTotale: req.body.pesoTotale,
-      pezzatura: req.body.pezzatura
     });
-    prodotti
-      .save(prodotti)
-      .then(data => {
-        res.status(200).send(data);
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: `${err.message} - Errore nella creazione del prodotto.`
-        });
+};
+
+exports.findProductsplit = (req, res) => {
+  Prodottisplit.find()
+    .distinct("prodotto")
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: `${err.message} - Errore nel recupero dei prodotti.`,
       });
-  };
-  
-  exports.deleteProductsplit = (req, res) => {
-    const prodDaCanc = req.params.id;
-    Prodottisplit.findByIdAndDelete(prodDaCanc)
-      .then(data => {
-        if (!data) {
-          res.status(404).send({
-            message: `${err.message} - Non posso cancellare il prodotto ${prodDaCanc} con id=${id}`
-          });
-        } else {
-          res.status(200).send({
-            message: `Prodotto ${prodDaCanc} cancellato!`
-          });
-        }
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: `${err.message} - Non posso cancellare il prodotto ${prodDaCanc} con id=${id}`
-        });
+    });
+};
+
+exports.findPesosplit = (req, res) => {
+  const prodotto = req.params.prodotto;
+  var condition = { prodotto: { $regex: new RegExp(prodotto), $options: "i" } };
+  Prodottisplit.find(condition)
+    .distinct("pesoTotale")
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: `${err.message} - Errore nel recupero dei prodotti.`,
       });
-  };
+    });
+};
+
+exports.findPezzaturasplit = (req, res) => {
+  const prodotto = req.query.prodotto;
+  const peso = req.query.peso;
+  Prodottisplit.find({ $and: [{ prodotto: prodotto }, { pesoTotale: peso }] })
+    .distinct("pezzatura")
+    .collation({ locale: "en_US", numericOrdering: true })
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: `${err.message} - Errore nel recupero dei prodotti.`,
+      });
+    });
+};
+
+exports.createProductsplit = (req, res) => {
+  if (!req.body.prodotto) {
+    res.status(400).send({ message: "Il prodotto non può essere vuoto!" });
+    return;
+  }
+  const prodotti = new Prodottisplit({
+    prodotto: req.body.prodotto,
+    pesoTotale: req.body.pesoTotale,
+    pezzatura: req.body.pezzatura,
+  });
+  prodotti
+    .save(prodotti)
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: `${err.message} - Errore nella creazione del prodotto.`,
+      });
+    });
+};
+
+exports.deleteProductsplit = (req, res) => {
+  const prodDaCanc = req.params.id;
+  Prodottisplit.findByIdAndDelete(prodDaCanc)
+    .then((data) => {
+      if (!data) {
+        res.status(404).send({
+          message: `${err.message} - Non posso cancellare il prodotto ${prodDaCanc} con id=${id}`,
+        });
+      } else {
+        res.status(200).send({
+          message: `Prodotto ${prodDaCanc} cancellato!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: `${err.message} - Non posso cancellare il prodotto ${prodDaCanc} con id=${id}`,
+      });
+    });
+};
 
 /*#########################
      API GESTIONE ORDINI
@@ -182,7 +193,7 @@ exports.createOrdine = (req, res) => {
   }
 
   var day;
-  if ((new Date().getDate().toString().length) === 1) {
+  if (new Date().getDate().toString().length === 1) {
     day = "0" + new Date().getDate();
   } else {
     day = new Date().getDate();
@@ -191,13 +202,13 @@ exports.createOrdine = (req, res) => {
   switch (new Date().getMonth().toString()) {
     case "0":
       month = "01";
-      break; 
+      break;
     case "1":
       month = "02";
-      break; 
+      break;
     case "2":
       month = "03";
-      break; 
+      break;
     case "3":
       month = "04";
       break;
@@ -209,22 +220,22 @@ exports.createOrdine = (req, res) => {
       break;
     case "6":
       month = "07";
-      break; 
+      break;
     case "7":
       month = "08";
       break;
     case "8":
       month = "09";
-       break; 
+      break;
     case "9":
       month = "10";
-      break; 
+      break;
     case "10":
       month = "11";
-      break; 
+      break;
     case "11":
       month = "12";
-      break; 
+      break;
   }
 
   const ordini = new Ordini({
@@ -236,24 +247,23 @@ exports.createOrdine = (req, res) => {
     grammatura: req.body.grammatura,
     pesoProdotto: req.body.pesoProdotto,
     note: req.body.note,
-    isCustom: req.body.isCustom
+    isCustom: req.body.isCustom,
   });
   ordini
     .save(ordini)
-    .then(data => {
+    .then((data) => {
       res.status(200).send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message:
-          err.message || "Errore nella creazione dell'ordine."
+        message: err.message || "Errore nella creazione dell'ordine.",
       });
     });
 };
 
 exports.findAllTodayUser = (req, res) => {
   var day;
-  if ((new Date().getDate().toString().length) === 1) {
+  if (new Date().getDate().toString().length === 1) {
     day = "0" + new Date().getDate();
   } else {
     day = new Date().getDate();
@@ -263,13 +273,13 @@ exports.findAllTodayUser = (req, res) => {
   switch (new Date().getMonth().toString()) {
     case "0":
       month = "01";
-      break; 
+      break;
     case "1":
       month = "02";
-      break; 
+      break;
     case "2":
       month = "03";
-      break; 
+      break;
     case "3":
       month = "04";
       break;
@@ -281,39 +291,44 @@ exports.findAllTodayUser = (req, res) => {
       break;
     case "6":
       month = "07";
-      break; 
+      break;
     case "7":
       month = "08";
       break;
     case "8":
       month = "09";
-       break; 
+      break;
     case "9":
       month = "10";
-      break; 
+      break;
     case "10":
       month = "11";
-      break; 
+      break;
     case "11":
       month = "12";
-      break; 
+      break;
   }
 
-  Ordini.find({ $and: [{ dataInserimento: `${new Date().getFullYear()}${month}${day}` }, { seller: req.params.seller }] }).sort({ 'desc': 1 })
-    .then(data => {
+  Ordini.find({
+    $and: [
+      { dataInserimento: `${new Date().getFullYear()}${month}${day}` },
+      { seller: req.params.seller },
+    ],
+  })
+    .sort({ desc: 1 })
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message:
-          err.message || "Errore nel recupero degli utenti."
+        message: err.message || "Errore nel recupero degli utenti.",
       });
     });
 };
 
 exports.findAllOrdini = (req, res) => {
   var day;
-  if ((new Date().getDate().toString().length) === 1) {
+  if (new Date().getDate().toString().length === 1) {
     day = "0" + new Date().getDate();
   } else {
     day = new Date().getDate();
@@ -323,13 +338,13 @@ exports.findAllOrdini = (req, res) => {
   switch (new Date().getMonth().toString()) {
     case "0":
       month = "01";
-      break; 
+      break;
     case "1":
       month = "02";
-      break; 
+      break;
     case "2":
       month = "03";
-      break; 
+      break;
     case "3":
       month = "04";
       break;
@@ -341,45 +356,49 @@ exports.findAllOrdini = (req, res) => {
       break;
     case "6":
       month = "07";
-      break; 
+      break;
     case "7":
       month = "08";
       break;
     case "8":
       month = "09";
-       break; 
+      break;
     case "9":
       month = "10";
-      break; 
+      break;
     case "10":
       month = "11";
-      break; 
+      break;
     case "11":
       month = "12";
-      break; 
+      break;
   }
-  Ordini.find({ dataInserimento: `${new Date().getFullYear()}${month}${day}` }).sort({ 'desc': 1 })
-    .then(data => {
+  Ordini.find({ dataInserimento: `${new Date().getFullYear()}${month}${day}` })
+    .sort({ desc: 1 })
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message:
-          err.message || "Errore nel recupero degli ordini."
+        message: err.message || "Errore nel recupero degli ordini.",
       });
     });
 };
 
-
 exports.findAllDayUser = (req, res) => {
-  Ordini.find({ $and: [{ dataInserimento: req.query.orderDate }, { seller: req.query.seller }] }).sort({ 'desc': 1 })
-    .then(data => {
+  Ordini.find({
+    $and: [
+      { dataInserimento: req.query.orderDate },
+      { seller: req.query.seller },
+    ],
+  })
+    .sort({ desc: 1 })
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message:
-          err.message || "Errore nel recupero degli utenti."
+        message: err.message || "Errore nel recupero degli utenti.",
       });
     });
 };
@@ -387,20 +406,20 @@ exports.findAllDayUser = (req, res) => {
 exports.deleteOrdine = (req, res) => {
   const id = req.params.id;
   Ordini.findByIdAndRemove(id)
-    .then(data => {
+    .then((data) => {
       if (!data) {
         res.status(404).send({
-          message: `Errore nella cancellazione dell'ordine con id=${id}. Non è stato trovato!`
+          message: `Errore nella cancellazione dell'ordine con id=${id}. Non è stato trovato!`,
         });
       } else {
         res.send({
-          message: "Ordine cancellato!"
+          message: "Ordine cancellato!",
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: "Errore nella cancellazione del prodotto con id: " + id
+        message: "Errore nella cancellazione del prodotto con id: " + id,
       });
     });
 };
@@ -410,66 +429,70 @@ exports.deleteOrdine = (req, res) => {
   #########################*/
 
 exports.findOrderMonthYear = (req, res) => {
-  Ordini.aggregate([{
-    $project: {
-      'monthyear': {
-        $substr: [
-          "$dataInserimento",0,6
-        ]
-      }
-    }
-  },
-  {
-  $group: {
-    _id: "$monthyear",
-    dataInserimento: {$first: "$monthyear"}
-  }
-  },
-  {
-    $sort:
-      { _id: 1 }
-  }], function(err, result) {
-    if (err) {
-      res.send({
-        message: `Non riesco ad aggregare gli ordini ${err}`
-      })
-    }
-    res.send(result);
-  }
-  )};
-
-  exports.findOrderYear = (req, res) => {
-    Ordini.aggregate([{
-      $project: {
-        'monthyear': {
-          $substr: [
-            "$dataInserimento",0,4
-          ]
-        }
-      }
-    },
-    {
-    $group: {
-      _id: "$monthyear",
-      dataInserimento: {$first: "$monthyear"}
-    }
-    },
-    {
-      $sort:
-        { _id: 1 }
-    }], function(err, result) {
+  Ordini.aggregate(
+    [
+      {
+        $project: {
+          monthyear: {
+            $substr: ["$dataInserimento", 0, 6],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$monthyear",
+          dataInserimento: { $first: "$monthyear" },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ],
+    function (err, result) {
       if (err) {
         res.send({
-          message: `Non riesco ad aggregare gli ordini ${err}`
-        })
+          message: `Non riesco ad aggregare gli ordini ${err}`,
+        });
       }
       res.send(result);
     }
-    )};
+  );
+};
+
+exports.findOrderYear = (req, res) => {
+  Ordini.aggregate(
+    [
+      {
+        $project: {
+          monthyear: {
+            $substr: ["$dataInserimento", 0, 4],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$monthyear",
+          dataInserimento: { $first: "$monthyear" },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ],
+    function (err, result) {
+      if (err) {
+        res.send({
+          message: `Non riesco ad aggregare gli ordini ${err}`,
+        });
+      }
+      res.send(result);
+    }
+  );
+};
 
 exports.todayOrder = (req, res) => {
   var day;
-  if ((new Date().getDate().toString().length) === 1) {
+  if (new Date().getDate().toString().length === 1) {
     day = "0" + new Date().getDate();
   } else {
     day = new Date().getDate();
@@ -479,13 +502,13 @@ exports.todayOrder = (req, res) => {
   switch (new Date().getMonth().toString()) {
     case "0":
       month = "01";
-      break; 
+      break;
     case "1":
       month = "02";
-      break; 
+      break;
     case "2":
       month = "03";
-      break; 
+      break;
     case "3":
       month = "04";
       break;
@@ -497,173 +520,176 @@ exports.todayOrder = (req, res) => {
       break;
     case "6":
       month = "07";
-      break; 
+      break;
     case "7":
       month = "08";
       break;
     case "8":
       month = "09";
-       break; 
+      break;
     case "9":
       month = "10";
-      break; 
+      break;
     case "10":
       month = "11";
-      break; 
+      break;
     case "11":
       month = "12";
-      break; 
+      break;
   }
 
   const today = String(`${new Date().getFullYear()}${month}${day}`);
-  Ordini.aggregate([{
-    $match: {
-      dataInserimento: today
+  Ordini.aggregate(
+    [
+      {
+        $match: {
+          dataInserimento: today,
+        },
+      },
+      {
+        $group: {
+          _id: {
+            desc: "$desc",
+            pesoProdotto: "$pesoProdotto",
+            pezzatura: "$grammatura",
+          },
+          ordini: {
+            $sum: 1,
+          },
+          totale: {
+            $sum: "$pesoTotale",
+          },
+          qty: {
+            $sum: "$qty",
+          },
+          dataInserimento: {
+            $first: today,
+          },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ],
+    function (err, result) {
+      if (err) {
+        res.send({
+          message: `Non riesco ad aggregare gli ordini ${err}`,
+        });
+      }
+      res.send(result);
     }
-  },
-  {
-    $group: {
-      _id: {
-    "desc": "$desc",
-    "pesoProdotto": "$pesoProdotto",
-    "pezzatura": "$grammatura"
-  },
-      ordini: {
-        $sum: 1
-      },
-      totale: {
-        $sum: "$pesoTotale"
-      },
-      qty: {
-        $sum: "$qty"
-      },
-      dataInserimento: {
-        $first: today
-      },
-    }
-  },
-  {
-    $sort:
-      { _id: 1 }
-  }
-  ], function (err, result) {
-    if (err) {
-      res.send({
-        message: `Non riesco ad aggregare gli ordini ${err}`
-      })
-    }
-    res.send(result);
-  }
-  )
-}
+  );
+};
 
 exports.dateOrder = (req, res) => {
   const today = String(req.params.orderDate);
-  Ordini.aggregate([{
-    $match: {
-      dataInserimento: today
+  Ordini.aggregate(
+    [
+      {
+        $match: {
+          dataInserimento: today,
+        },
+      },
+      {
+        $group: {
+          _id: {
+            desc: "$desc",
+            pesoProdotto: "$pesoProdotto",
+            pezzatura: "$grammatura",
+          },
+          ordini: {
+            $sum: 1,
+          },
+          totale: {
+            $sum: "$pesoTotale",
+          },
+          qty: {
+            $sum: "$qty",
+          },
+          dataInserimento: {
+            $first: today,
+          },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ],
+    function (err, result) {
+      if (err) {
+        res.send({
+          message: `Non riesco ad aggregare gli ordini ${err}`,
+        });
+      }
+      res.send(result);
     }
-  },
-  {
-    $group: {
-      _id: {
-    "desc": "$desc",
-    "pesoProdotto": "$pesoProdotto",
-    "pezzatura": "$grammatura"
-  },
-      ordini: {
-        $sum: 1
-      },
-      totale: {
-        $sum: "$pesoTotale"
-      },
-      qty: {
-        $sum: "$qty"
-      },
-      dataInserimento: {
-        $first: today
-      },
-    }
-  },
-  {
-    $sort:
-      { _id: 1 }
-  }
-  ], function (err, result) {
-    if (err) {
-      res.send({
-        message: `Non riesco ad aggregare gli ordini ${err}`
-      })
-    }
-    res.send(result);
-  }
-  )
-}
-
+  );
+};
 
 exports.monthyearReport = (req, res) => {
   const search = String(req.params.monthyear);
-  Ordini.aggregate([{
-    $match: {
-      dataInserimento: new RegExp(`^${search}`)
-    }
-  },
-  {
-    $group: {
-      _id: {
-    "desc": "$desc",
-    "pesoProdotto": "$pesoProdotto",
-    "pezzatura": "$grammatura"
-  },
-      totale: {
-        $sum: "$pesoTotale"
+  Ordini.aggregate(
+    [
+      {
+        $match: {
+          dataInserimento: new RegExp(`^${search}`),
+        },
       },
-      qty: {
-        $sum: "$qty"
+      {
+        $group: {
+          _id: {
+            desc: "$desc",
+            pesoProdotto: "$pesoProdotto",
+            pezzatura: "$grammatura",
+          },
+          totale: {
+            $sum: "$pesoTotale",
+          },
+          qty: {
+            $sum: "$qty",
+          },
+        },
       },
+      {
+        $sort: { _id: 1 },
+      },
+    ],
+    function (err, result) {
+      if (err) {
+        res.send({
+          message: `Non riesco ad aggregare gli ordini ${err}`,
+        });
+      }
+      res.send(result);
     }
-  },
-  {
-    $sort:
-      { _id: 1 }
-  }
-  ], function (err, result) {
-    if (err) {
-      res.send({
-        message: `Non riesco ad aggregare gli ordini ${err}`
-      })
-    }
-    res.send(result);
-  }
-  )
-}
+  );
+};
 
 exports.dateOrderAll = (req, res) => {
   if (req.params.orderDate) {
-    Ordini.find({ dataInserimento: req.params.orderDate }).sort({ 'desc': 1 })
-      .then(data => {
+    Ordini.find({ dataInserimento: req.params.orderDate })
+      .sort({ desc: 1 })
+      .then((data) => {
         res.send(data);
       })
-      .catch(err => {
+      .catch((err) => {
         res.status(500).send({
-          message:
-            err.message || "Errore nel recupero degli ordini."
+          message: err.message || "Errore nel recupero degli ordini.",
         });
       });
   } else {
     Ordini.find()
-      .then(data => {
+      .then((data) => {
         res.send(data);
       })
-      .catch(err => {
+      .catch((err) => {
         res.status(500).send({
-          message:
-            err.message || "Errore nel recupero degli ordini."
+          message: err.message || "Errore nel recupero degli ordini.",
         });
       });
   }
 };
-
 
 /*#########################
          API LOGGING
@@ -673,20 +699,33 @@ exports.createLog = (req, res) => {
     severity: req.body.severity,
     username: req.body.username,
     page: req.body.page,
-    text: req.body.text
+    text: req.body.text,
   });
   line
     .save(line)
-    .then(data => {
+    .then((data) => {
       res.status(200).send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message:
-          err.message || "Errore nella creazione del log"
+        message: err.message || "Errore nella creazione del log",
       });
     });
 };
+
+exports.getLog = (req, res) => {
+  Log.find()
+    .sort({ timestamp: 1 })
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: `${err.message} - Errore nel recupero dei log.`,
+      });
+    });
+};
+
 //TEST EXPORTS
 exports.allAccess = (req, res) => {
   res.status(200).send("Benvenuto, gestisci i tuoi otdini da qui.");
