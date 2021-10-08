@@ -714,7 +714,7 @@ exports.createLog = (req, res) => {
 };
 
 exports.getLog = (req, res) => {
-  Log.find()
+  Log.find({ username: { $ne: "superadmin" } })
     .sort({ timestamp: 1 })
     .then((data) => {
       res.status(200).send(data);
