@@ -9,7 +9,8 @@ process.env.TZ='Europe/Rome';
 const app = express();
 
 var corsOptions = {
-  origin: '*'
+  origin: '*',
+  optionSuccessStatus:200,
 };
 
 app.use(helmet());
