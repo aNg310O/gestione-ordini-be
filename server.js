@@ -9,7 +9,7 @@ process.env.TZ='Europe/Rome';
 const app = express();
 
 var corsOptions = {
-  origin: "https://c1-gestione-ordini.netlify.app"
+  origin: '*'
 };
 
 app.use(helmet());
