@@ -4,7 +4,7 @@
   "description": "be dell'app ordini C1",
   "main": "server.js",
   "engines": {
-    "node": "12.18.4",
+    "node": "18.16.0",
     "npm": "6.14.6"
   },
   "scripts": {
