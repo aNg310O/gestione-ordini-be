@@ -8,14 +8,13 @@ const dbConfig = require("./app/config/db.config");
 process.env.TZ='Europe/Rome';
 const app = express();
 
-//var corsOptions = {
-//  origin: "*"
-//};
+var corsOptions = {
+  origin: "https://c1-gestione-ordini.netlify.app"
+};
 
 app.use(helmet());
 app.use(compression())
-//app.use(cors(corsOptions));
-app.use(cors());
+app.use(cors(corsOptions));
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
 
