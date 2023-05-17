@@ -8,13 +8,14 @@ const dbConfig = require("./app/config/db.config");
 process.env.TZ='Europe/Rome';
 const app = express();
 
-var corsOptions = {
-  origin: "*"
-};
+//var corsOptions = {
+//  origin: "*"
+//};
 
 app.use(helmet());
 app.use(compression())
-app.use(cors(corsOptions));
+//app.use(cors(corsOptions));
+app.use(cors());
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
 
