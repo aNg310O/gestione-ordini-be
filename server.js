@@ -8,6 +8,7 @@ const dbConfig = require("./app/config/db.config");
 process.env.TZ='Europe/Rome';
 const app = express();
 
+// commento per re-deploy
 var corsOptions = {
   origin: "*"
 };
